@@ -33,7 +33,7 @@ namespace SerilogMetrics.Samples.Console
 					outputTemplate: "{Timestamp:HH:mm:ss} ({ThreadId}) [{Level}] {Message}{NewLine}{Exception}")
 				.CreateLogger();
 
-            logger.BeginUnscopedTimedOperation("No scope test", "no-scope");
+            logger.BeginUnscopedTimedOperation("No scope test", "no-scope");  // Time entire operation
 
             using (logger.BeginTimedOperation("Time a thread sleep for 2 seconds."))
             {
@@ -45,7 +45,7 @@ namespace SerilogMetrics.Samples.Console
                 Thread.Sleep(1000);
             }
 
-            using (logger.BeginTimedOperation("Using a passed in identifier", "test-loop"))
+            using (logger.BeginTimedOperation("Using a passed in identifier (b)", "test-loop"))
             {
                 // ReSharper disable once NotAccessedVariable
                 var b = "";
@@ -55,8 +55,7 @@ namespace SerilogMetrics.Samples.Console
                 }
             }
 
-            logger.BeginUnscopedTimedOperation("No scope test", "no-scope2");
-
+            logger.BeginUnscopedTimedOperation("No scope test", "no-scope2");  // time a short section of code without scoped braces
             // ReSharper disable once NotAccessedVariable
             var a = "";
 			for (var i = 0; i < 1000; i++)
@@ -90,10 +89,10 @@ namespace SerilogMetrics.Samples.Console
             counter.Add(10);
             counter.Add(-5);
 
+            Task t = Program.ExampleMethodAsync();
+            logger.LogTaskExecutionTime(t, "ExampleMethodAsync", "myid1");  // will log when above task completes
 
             logger.EndTimedOperation("No scope test", "no-scope");
-            Task t = Program.ExampleMethodAsync();
-            logger.LogTaskExecutionTime(t, "ExampleMethodAsync", "myid1");
             Log.CloseAndFlush();
 
             // Wait for the task to complete by just waiting for an enter key

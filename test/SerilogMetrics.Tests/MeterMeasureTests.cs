@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Serilog.Events;
-using System.Reactive.Linq;
-using Serilog.Context;
-using System.Collections.Generic;
 using Serilog;
 using Xunit;
 
@@ -25,7 +20,6 @@ namespace SerilogMetrics.Tests
 
     public class MeterMeasureTests : IClassFixture<SerilogFixture>
     {
-
         SerilogFixture fixture;
 
         public MeterMeasureTests(SerilogFixture fixture)
@@ -33,38 +27,25 @@ namespace SerilogMetrics.Tests
             this.fixture = fixture;
         }
 
-
         [Fact]
         public void MeterShouldWriteOutput()
         {
             var meter = fixture.Logger.MeterOperation("server load", "requests", TimeUnit.Seconds);
-
             meter.Mark();
-
             meter.Write();
-
             Assert.Contains("\"server load\" count = 1, ", fixture.EventSeen.RenderMessage());
 
-
             System.Threading.Thread.Sleep(2000);
-
             meter.Mark(2);
-
             meter.Write();
-
             Assert.Contains("\"server load\" count = 3, ", fixture.EventSeen.RenderMessage());
 
             //Wait a minute
             System.Threading.Thread.Sleep(60000);
-
             meter.Mark(2);
-
             meter.Write();
-
             Assert.Contains("\"server load\" count = 5, ", fixture.EventSeen.RenderMessage());
-
             Assert.Equal(5, meter.Count);
         }
     }
-
 }
