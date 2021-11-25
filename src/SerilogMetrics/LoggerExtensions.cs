@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Serilog.Events;
 using SerilogMetrics;                   
 
@@ -25,6 +27,9 @@ namespace Serilog
     /// </summary>
     public static class LoggerExtensions
     {
+
+        static Dictionary<string, TimedOperation> currentOperation = new Dictionary<string, TimedOperation>();
+        static Dictionary<string, TimedTaskOperation> currentTaskOperation = new Dictionary<string, TimedTaskOperation>();
 
         /// <summary>
         /// The default gauge template.
@@ -95,7 +100,114 @@ namespace Serilog
             return new TimedOperation(logger, level, warnIfExceeds, operationIdentifier, description, levelExceeds, beginningMessage, completedMessage, exceededOperationMessage, propertyValues);
         }
 
+        /// <summary>
+        /// May be placed before any code you wish to time. 
+        /// When EndTimedOperation is called, the time it took is logged.
+        /// 
+        /// In addition you can specify a warning limit. If it takes more time to execute the code than the specified limit, another message will be logged.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <param name="identifier">The identifier used for the timing. Must be specified as this is how EndTimedOperation
+        /// knows which operation to stop.</param>
+        /// <param name="description">A description for this operation.</param>
+        /// <param name="level">The level used to write the timing operation details to the log. By default this is the information level.</param>
+        /// <param name="warnIfExceeds">Specifies a limit, if it takes more than this limit, the level will be set to warning. By default this is not used.</param>
+        /// <param name = "levelExceeds">The level used when the timed operation exceeds the limit set. By default this is Warning.</param>
+        /// <param name = "beginningMessage">Template used to indicate the begin of a timed operation. By default it uses the BeginningOperationTemplate.</param>
+        /// <param name = "completedMessage">Template used to indicate the completion of a timed operation. By default it uses the CompletedOperationTemplate.</param>
+        /// <param name = "exceededOperationMessage">Template used to indicate the exceeding of an operation. By default it uses the OperationExceededTemlate.</param>
+        /// <param name = "propertyValues">Additional values to be logged along side the timing data.</param>
+        /// <returns>A disposable object. Wrap this inside a using block so the dispose can be called to stop the timing.</returns>
+        /// <example>
+        /// See the example how to wrap 
+        /// <code>
+        /// logger.BeginUnscopedTimedOperation("Time a thread sleep for 2 seconds.", "myID");
+        /// var t = Task.Run(() => MyLongRunningTask("Task") );
+        /// // Lots of other code executing while task is running
+        /// // ...
+        /// // ...
+        /// t.Wait();
+        /// Logger.EndTimedOperation("any message", "myID"); // Note: SAME ID as above
+        /// </code>
+        /// </example>
+        public static IDisposable BeginUnscopedTimedOperation(
+            this ILogger logger,
+            string description,
+            string identifier = null,
+            LogEventLevel level = LogEventLevel.Information,
+            TimeSpan? warnIfExceeds = null,
+            LogEventLevel levelExceeds = LogEventLevel.Warning,
+            string beginningMessage = TimedOperation.BeginningOperationTemplate, string completedMessage = TimedOperation.CompletedOperationTemplate, string exceededOperationMessage = TimedOperation.OperationExceededTemplate,
+            params object[] propertyValues)
+        {
+            object operationIdentifier = identifier;
 
+            if (string.IsNullOrEmpty(identifier))
+                throw new ArgumentNullException("identifier can't be null");
+                
+            currentOperation.Add(operationIdentifier.ToString(),
+                new TimedOperation(logger, level, warnIfExceeds, operationIdentifier, description, levelExceeds, beginningMessage, completedMessage, exceededOperationMessage, propertyValues));
+
+            return currentOperation[operationIdentifier.ToString()];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="task"></param>
+        /// <param name="description"></param>
+        /// <param name="identifier"></param>
+        /// <param name="level"></param>
+        /// <param name="warnIfExceeds"></param>
+        /// <param name="levelExceeds"></param>
+        /// <param name="completedMessage"></param>
+        /// <param name="exceededOperationMessage"></param>
+        /// <param name="propertyValues"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IDisposable LogTaskExecutionTime(
+            this ILogger logger,
+            Task task,
+            string description,
+            string identifier = null,
+            LogEventLevel level = LogEventLevel.Information,
+            TimeSpan? warnIfExceeds = null,
+            LogEventLevel levelExceeds = LogEventLevel.Warning,
+            string completedMessage = TimedOperation.CompletedOperationTemplate, string exceededOperationMessage = TimedOperation.OperationExceededTemplate,
+            params object[] propertyValues)
+        {
+            object operationIdentifier = identifier;
+
+            if (string.IsNullOrEmpty(identifier))
+                throw new ArgumentNullException("identifier can't be null");
+
+            currentTaskOperation.Add(operationIdentifier.ToString(),
+                new TimedTaskOperation(logger, level, warnIfExceeds, task, operationIdentifier, description, levelExceeds, completedMessage, exceededOperationMessage, propertyValues));
+
+            return currentTaskOperation[operationIdentifier.ToString()];
+        }
+
+        /// <summary>
+        /// This will allow you to call BeginTimedOperation("message", "key")  from anywhere, without using
+        /// braces to scope it and to end the timed operation, just call this with the same key.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="description"></param>
+        /// <param name="identifier"></param>
+        /// <param name="propertyValues"></param>
+        public static void EndTimedOperation(
+            this ILogger logger,
+            string description,
+            string identifier,
+            params object[] propertyValues)
+        {
+            if(currentOperation.ContainsKey(identifier))
+            {
+                currentOperation[identifier].Dispose();
+                currentOperation.Remove(identifier);
+            }
+        }
 
         /// <summary>
         /// Retrieves a value as defined by the operation. For example the number of items inside a queue.

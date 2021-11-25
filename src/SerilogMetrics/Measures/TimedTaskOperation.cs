@@ -17,13 +17,14 @@ using System.Linq;
 using System.Diagnostics;
 using Serilog.Events;
 using Serilog;
+using System.Threading.Tasks;
 
 namespace SerilogMetrics
 {
 	/// <summary>
 	/// Timed operation.
 	/// </summary>
-	public class TimedOperation : IDisposable
+	public class TimedTaskOperation : IDisposable
 	{
 		readonly ILogger _logger;
 		readonly LogEventLevel _level;
@@ -53,26 +54,25 @@ namespace SerilogMetrics
 		/// </summary>
 		public const string OperationExceededTemplate = "Operation {TimedOperationId}: {TimedOperationDescription} exceeded the limit of {WarningLimit} by completing in {TimedOperationElapsed}  ({TimedOperationElapsedInMs} ms)";
 
-		readonly string _beginningOperationMessage;
 		readonly string _completedOperationMessage;
 		readonly string _exceededOperationMessage;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TimedOperation" /> class.
+		/// 
 		/// </summary>
-		/// <param name="logger">The logger.</param>
-		/// <param name="identifier">The identifier used for the timing. If non specified, a random guid will be used.</param>
-		/// <param name="description">A description for the operation.</param>
-		/// <param name="level">The level used to write the timing operation details to the logger. By default this is the information level.</param>
-		/// <param name="warnIfExceeds">Specifies a limit, if it takes more than this limit, the level will be set to warning. By default this is not used.</param>
-		/// <param name = "levelExceeds">The level used when the timed operation exceeds the limit set. By default this is Warning.</param>
-		/// <param name = "beginningMessage">Template used to indicate the begin of a timed operation. By default it uses the BeginningOperationTemplate.</param>
-		/// <param name = "completedMessage">Template used to indicate the completion of a timed operation. By default it uses the CompletedOperationTemplate.</param>
-		/// <param name = "exceededOperationMessage">Template used to indicate the exceeding of an operation. By default it uses the OperationExceededTemlate.</param>
-		/// <param name = "propertyValues">Additional values to be logged along side the timing data.</param>
-		public TimedOperation (ILogger logger, LogEventLevel level, TimeSpan? warnIfExceeds, object identifier, string description, 
+		/// <param name="logger"></param>
+		/// <param name="level"></param>
+		/// <param name="warnIfExceeds"></param>
+		/// <param name="task"></param>
+		/// <param name="identifier"></param>
+		/// <param name="description"></param>
+		/// <param name="levelExceeds"></param>
+		/// <param name="completedMessage"></param>
+		/// <param name="exceededOperationMessage"></param>
+		/// <param name="propertyValues"></param>
+		public TimedTaskOperation(ILogger logger, LogEventLevel level, TimeSpan? warnIfExceeds, Task task, object identifier, string description, 
 		                      LogEventLevel levelExceeds = LogEventLevel.Warning,
-		                      string beginningMessage = BeginningOperationTemplate, string completedMessage = CompletedOperationTemplate, string exceededOperationMessage = OperationExceededTemplate,
+		                      string completedMessage = CompletedOperationTemplate, string exceededOperationMessage = OperationExceededTemplate,
 		                      params object[] propertyValues)
 		{
 			_logger = logger;
@@ -84,14 +84,14 @@ namespace SerilogMetrics
 			_propertyValues = propertyValues;
 
 			// Messages
-			_beginningOperationMessage = beginningMessage ?? BeginningOperationTemplate;
 			_completedOperationMessage = completedMessage ?? CompletedOperationTemplate;
 			_exceededOperationMessage = exceededOperationMessage ?? OperationExceededTemplate;
 
-			// Write first message to indicate start
-			_logger.Write (_level, _beginningOperationMessage, GeneratePropertyBag (_identifier, _description));
-
 			_sw = Stopwatch.StartNew ();
+			task.GetAwaiter().OnCompleted(() =>
+			{
+				Dispose();
+			});
 		}
 
 		/// <summary>

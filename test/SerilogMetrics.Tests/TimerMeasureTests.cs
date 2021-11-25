@@ -83,6 +83,16 @@ namespace SerilogMetrics.Tests
 
         }
 
+        [Fact]
+        public void NoScopedTimedOperationShouldWriteMessages()
+        {
+            var check = fixture.Logger.BeginUnscopedTimedOperation("test", "test-id");
+
+            Assert.Equal("Beginning operation \"test-id\": \"test\"", fixture.EventSeen.RenderMessage());
+
+            fixture.Logger.EndTimedOperation("test", "test-id");
+            Assert.StartsWith("Completed operation \"test-id\"", fixture.EventSeen.RenderMessage(), StringComparison.Ordinal);
+        }
 
     }
 
