@@ -4,12 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
-using Serilog.Sinks.SystemConsole;
-using Serilog.Sinks.Async;
-using Serilog.Sinks.File;
-using Serilog.Enrichers;
 using Serilog.Events;
-using System.Text;
 
 namespace SerilogMetrics.Samples.Console
 {
@@ -26,8 +21,7 @@ namespace SerilogMetrics.Samples.Console
         static void LongRunningTask(String s)
         {
             Thread.Sleep(1500);
-            Console.WriteLine("{0} thread ID: {1}",
-                              s, Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("{0} thread ID: {1}", s, Thread.CurrentThread.ManagedThreadId);
         }
 
         static void Main()
@@ -39,19 +33,19 @@ namespace SerilogMetrics.Samples.Console
 					outputTemplate: "{Timestamp:HH:mm:ss} ({ThreadId}) [{Level}] {Message}{NewLine}{Exception}")
 				.CreateLogger();
 
-			//logger.BeginUnscopedTimedOperation("No scope test", "no-scope");
+            logger.BeginUnscopedTimedOperation("No scope test", "no-scope");
 
-            //using (logger.BeginTimedOperation("Time a thread sleep for 2 seconds."))
+            using (logger.BeginTimedOperation("Time a thread sleep for 2 seconds."))
             {
                 Thread.Sleep(1000);
-                //using (logger.BeginTimedOperation("And inside we try a Task.Delay for 2 seconds."))
+                using (logger.BeginTimedOperation("And inside we try a Task.Delay for 2 seconds."))
                 {
                     Task.Delay(2000).Wait();
                 }
                 Thread.Sleep(1000);
             }
 
-            //using (logger.BeginTimedOperation("Using a passed in identifier", "test-loop"))
+            using (logger.BeginTimedOperation("Using a passed in identifier", "test-loop"))
             {
                 // ReSharper disable once NotAccessedVariable
                 var b = "";
@@ -61,50 +55,47 @@ namespace SerilogMetrics.Samples.Console
                 }
             }
 
-            //logger.BeginUnscopedTimedOperation("No scope test", "no-scope2");
-			// ReSharper disable once NotAccessedVariable
-			var a = "";
+            logger.BeginUnscopedTimedOperation("No scope test", "no-scope2");
+
+            // ReSharper disable once NotAccessedVariable
+            var a = "";
 			for (var i = 0; i < 1000; i++)
 			{
 				a += "b";
 			}
-			//Thread.Sleep(1000);
-            //logger.EndTimedOperation("No scope test", "no-scope2");
+            Thread.Sleep(1000);
+            logger.EndTimedOperation("No scope test", "no-scope2");
 
-            //Exceed a limit
-            //using (logger.BeginTimedOperation("This should execute within 1 second.", null, LogEventLevel.Debug, TimeSpan.FromSeconds(1)))
+            // Exceed a limit
+            using (logger.BeginTimedOperation("This should execute within 1 second.", null, LogEventLevel.Debug, TimeSpan.FromSeconds(1)))
             {
-            //    Thread.Sleep(1100);
+                Thread.Sleep(1100);
             }
 
             //Gauge
-            //var queue = new Queue<int>();
-            //var gauge = logger.GaugeOperation("queue", "item(s)", () => queue.Count());
-
-            //gauge.Write();
-
-            //queue.Enqueue(20);
-
-            //gauge.Write();
-
-            //queue.Dequeue();
-
-            //gauge.Write();
+            var queue = new Queue<int>();
+            var gauge = logger.GaugeOperation("queue", "item(s)", () => queue.Count());
+            gauge.Write();
+            queue.Enqueue(20);
+            gauge.Write();
+            queue.Dequeue();
+            gauge.Write();
 
             // Counter
-            //var counter = logger.CountOperation("counter", "operation(s)", true, LogEventLevel.Debug, resolution: 2);
-            //counter.Increment();
-            //counter.Increment();
-            //counter.Increment();
-            //counter.Decrement();
-            //counter.Add(10);
-            //counter.Add(-5);
+            var counter = logger.CountOperation("counter", "operation(s)", true, LogEventLevel.Debug, resolution: 2);
+            counter.Increment();
+            counter.Increment();
+            counter.Increment();
+            counter.Decrement();
+            counter.Add(10);
+            counter.Add(-5);
 
 
-            //logger.EndTimedOperation("No scope test", "no-scope");
+            logger.EndTimedOperation("No scope test", "no-scope");
             Task t = Program.ExampleMethodAsync();
             logger.LogTaskExecutionTime(t, "ExampleMethodAsync", "myid1");
             Log.CloseAndFlush();
+
             // Wait for the task to complete by just waiting for an enter key
             System.Console.WriteLine("Press a key to exit.");
 			System.Console.ReadKey(true);

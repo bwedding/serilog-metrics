@@ -2,12 +2,10 @@
 
   <PropertyGroup>
     <AssemblyTitle>SerilogMetrics.Samples.Console</AssemblyTitle>
-    <TargetFrameworks>net46;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net48; netcoreapp3.1</TargetFrameworks>
     <AssemblyName>SerilogMetrics.Samples.Console</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>SerilogMetrics.Samples.Console</PackageId>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">1.0.4</RuntimeFrameworkVersion>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
