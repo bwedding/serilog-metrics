@@ -26,6 +26,7 @@ This method takes the same arguments as BeginTimedOperation but it requires a un
 which will be used when EndTimedOperation is called. See example below.
 
 e.g.
+```csharp
 logger.BeginUnscopedTimedOperation("Time a thread sleep for 2 seconds.", "myID");
 var t = Task.Run(() => MyLongRunningTask("Task") );
 // Lots of other code executing while task is running
@@ -38,11 +39,12 @@ Logger.EndTimedOperation("any message", "myID"); // Note: SAME ID as above
 public static EndTimedOperation(string description, string id); // Note: ID must match the call to BeginUnscopedTimedOperation
 
 public static IDisposable LogTaskExecutionTime(Task t, string description, string uniqueID)
+```
 This method takes the same arguments as BeginTimedOperation but also requires a Task task and string ID which is unique to this call.
 This is a "set and forget" method which creates an awaiter for the task and when the task finishes, it will log the time spent performing the task.
 
 e.g.
-
+```csharp
 static void LongRunningTask(String s)
 {
     Thread.Sleep(2500);
@@ -50,6 +52,7 @@ static void LongRunningTask(String s)
 
 Task t = Task.Run(() => LongRunningTask("SerilogMetrics2"));    // no await
 logger.LogTaskExecutionTime(t, "ExampleMethodAsync", "myid1");  // will log when above task completes
+```
 
 For example;
 ```csharp
