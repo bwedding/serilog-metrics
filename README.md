@@ -18,7 +18,10 @@ The metrics method extensions are extending the ILogger interface of Serilog. So
 SerilogMetrics2 extends functionality of SerilogMetrics which doesn't seem to be supported any longer.
 The following extension methods are added:
 
+```csharp
 public static IDisposable BeginUnscopedTimedOperation(string description, string id)
+```
+
 This method is exactly like BeginTimedOperation except it does not require that the scope of the timing be marked with braces.
 The EndTimedOperation() method may be called from anywhere in the code as long as the logger is in scope. 
 
