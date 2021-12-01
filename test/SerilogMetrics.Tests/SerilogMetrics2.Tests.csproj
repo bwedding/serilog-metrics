@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyTitle>SerilogMetrics.Tests</AssemblyTitle>
     <TargetFrameworks>net48; netcoreapp3.1</TargetFrameworks>
-    <AssemblyName>SerilogMetrics.Tests</AssemblyName>
+    <AssemblyName>SerilogMetrics2.Tests</AssemblyName>
     <PackageId>SerilogMetrics.Tests</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
