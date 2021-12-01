@@ -39,7 +39,8 @@ t.Wait();
 // EndTimedOperation must be called with the same string ID used above.
 Logger.EndTimedOperation("any message", "myID"); // Note: SAME ID as above
 
-public static EndTimedOperation(string description, string id); // Note: ID must match the call to BeginUnscopedTimedOperation
+// Note: ID must match the call to BeginUnscopedTimedOperation
+public static EndTimedOperation(string description, string id); 
 
 public static IDisposable LogTaskExecutionTime(Task t, string description, string uniqueID)
 ```
