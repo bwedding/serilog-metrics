@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{59B9A86B-47A4-47C8-A766-1AB25D1A4FCB}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,11 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{59B9A86B
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerilogMetrics", "src\SerilogMetrics\SerilogMetrics.csproj", "{264C91AF-6631-4E04-A2AC-E32E88055228}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerilogMetrics2", "src\SerilogMetrics\SerilogMetrics2.csproj", "{264C91AF-6631-4E04-A2AC-E32E88055228}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerilogMetrics.Tests", "test\SerilogMetrics.Tests\SerilogMetrics.Tests.csproj", "{2BC62583-75E2-4A1B-B4DA-54F1FEDAE846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerilogMetrics2.Tests", "test\SerilogMetrics.Tests\SerilogMetrics2.Tests.csproj", "{2BC62583-75E2-4A1B-B4DA-54F1FEDAE846}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerilogMetrics.Samples.Console", "samples\SerilogMetrics.Samples.Console\SerilogMetrics.Samples.Console.csproj", "{9201B67F-FE73-4092-8DB6-1D35219CA3C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SerilogMetrics2.Samples.Console", "samples\SerilogMetrics.Samples.Console\SerilogMetrics2.Samples.Console.csproj", "{9201B67F-FE73-4092-8DB6-1D35219CA3C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
