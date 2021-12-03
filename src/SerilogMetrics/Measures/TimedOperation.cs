@@ -41,17 +41,17 @@ namespace SerilogMetrics
 		/// <summary>
 		/// The beginning operation template.
 		/// </summary>
-		public const string BeginningOperationTemplate = "Begin {TimedOperationId}: {TimedOperationDescription}";
+		public const string BeginningOperationTemplate = "Begin {TimedOperationId}, {TimedOperationDescription}";
 
 		/// <summary>
 		/// The completed operation template.
 		/// </summary>
-		public const string CompletedOperationTemplate = "End {TimedOperationId}: {TimedOperationDescription} in {TimedOperationElapsed} ({TimedOperationElapsedInMs} ms)";
+		public const string CompletedOperationTemplate = "End {TimedOperationId}, {TimedOperationDescription}, {TimedOperationElapsed}: {TimedOperationElapsedInMs}, ms";
 
 		/// <summary>
 		/// The operation exceeded template.
 		/// </summary>
-		public const string OperationExceededTemplate = "Timeout {TimedOperationId}: {TimedOperationDescription} exceeded the limit of {WarningLimit} by completing in {TimedOperationElapsed}  ({TimedOperationElapsedInMs} ms)";
+		public const string OperationExceededTemplate = "Timeout {TimedOperationId}, {TimedOperationDescription}, exceeded the limit of {WarningLimit} by completing in, {TimedOperationElapsed},  {TimedOperationElapsedInMs}, ms";
 
 		readonly string _beginningOperationMessage;
 		readonly string _completedOperationMessage;
